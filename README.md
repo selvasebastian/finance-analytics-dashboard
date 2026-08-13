@@ -1,2 +1,8 @@
 # finance-analytics-dashboard
-Finance analytics dashboard built with HTML, CSS, Flask, SQLite, DataTables.js and Chart.js. Lets users browse transactions in a searchable table and explore spending, income, account balances, and budget through interactive charts. 
+
+A web application that helps users understand their personal finances through an interactive transaction table and summary visualizations (spending by categories, income vs. expenses, account comparisons, net worth, and budget tracking).
+
+# Tech stack
+- Frontend: HTML, CSS, Bootstrap, DataTables.js, Chart.js
+- Backend: Pyhton, Flask
+- Database: SQLite

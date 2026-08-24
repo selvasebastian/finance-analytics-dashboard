@@ -4,5 +4,5 @@ A web application that helps users understand their personal finances through an
 
 # Tech stack
 - Frontend: HTML, CSS, Bootstrap, DataTables.js, Chart.js
-- Backend: Pyhton, Flask
+- Backend: Python, Flask
 - Database: SQLite

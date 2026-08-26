@@ -30,6 +30,7 @@ Conventions:
 - categories.kind: income or expense.
 - accounts.type: checking, savings, cash or credit.
 
+```
 ## API routes
 GET, POST  /api/transactions                        Lists or creates transactions.
 POST       /api/transactions/import                 CSV upload, creates multiple transactions.
@@ -39,6 +40,7 @@ GET, PUT   /api/budgets?month=YYYY-MM               Reads or sets budgets for th
 GET        /api/summary/by-category?month=YYYY-MM   Spending and income totals per category.
 GET        /api/summary/monthly                     Income vs. expenses per month.
 GET        /api/summary/net-worth                   Balance per account (optional feature).
+```
 
 All amounts are returned as integer cents.
 

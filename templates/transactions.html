@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions</title>
+    <!--Bootstrap for layout-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!--DataTable for the table-->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Transactions</h1>
+
+    <table id="transactions-table" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Desription</th>
+                <th>Category</th>
+                <th>Account</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!--jQuery is necessary for DataTables-->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- JavaScript, that loads the transactions.-->
+<script src="{{ url_for('static', filename='transactions.js')}}"></script>
+</body>
+</html>

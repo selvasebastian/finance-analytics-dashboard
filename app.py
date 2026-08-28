@@ -22,7 +22,10 @@ def get_transactions():
 
     # Get every transaction with the account and category name
     cur.execute(
-        "SELECT transactions.id, transactions.transaction_date, transactions.description, transactions.amount_cents," "accounts.name, categories.name " "FROM transactions, accounts, categories " "WHERE transactions.account_id = accounts.id AND transactions.category_id = categories.id " "ORDER BY transactions.transaction_date DESC")
+        "SELECT transactions.id, transactions.transaction_date, transactions.description, transactions.amount_cents," "accounts.name, categories.name "
+        "FROM transactions, accounts, categories "
+        "WHERE transactions.account_id = accounts.id AND transactions.category_id = categories.id "
+        "ORDER BY transactions.transaction_date DESC")
 
     rows = cur.fetchall()
     conn.close()

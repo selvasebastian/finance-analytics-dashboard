@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 import sqlite3
 
 app = Flask(__name__)
@@ -8,7 +8,12 @@ app = Flask(__name__)
 def home():
     return "Dashboard is running"
 
-# Returns all transactions as JSON
+# Shows the transactions page
+@app.route("/transactions")
+def transactions_page():
+    return render_template("transactions.html")
+
+# GET/api/transactions - lists all transactions with account- and category names
 @app.route("/api/transactions")
 def get_transactions():
     # Connect to database

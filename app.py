@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 import sqlite3
 
 app = Flask(__name__)
@@ -41,6 +41,36 @@ def get_transactions():
         transactions.append(transaction)
 
     return jsonify(transactions)
+
+# POST /api/transactions - creates one transaction
+@app.route("/api/transactions", methods=["POST"])
+def create_transaction():
+    # Conntect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Read the JSON data
+    data = request.get_json()
+
+    # Convert the euro amount into cents
+    amount_cents = round(float(data["amount"]) * 100)
+
+    cur.execute(
+        "INSERT INTO transactions (transaction_date, description, amount_cents, account_id, category_id)"
+        "VALUES (:date, :description, :amount_cents, :account_id, :category_id)",
+        {
+        "date": data["date"],
+        "description": data["description"],
+        "amount_cents": amount_cents,
+        "account_id": data["account_id"],
+        "category_id": data ["category_id"],
+        }
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Transaction created"})
 
 # GET /api/categories - lists all categories
 @app.route("/api/categories")

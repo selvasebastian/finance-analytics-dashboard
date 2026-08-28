@@ -54,3 +54,23 @@ async function loadAccountOptions() {
         accountSelect.appendChild(option);
     }
 }
+
+// Fetches all categories and fills dropdown for categories
+async function loadCategoryOptions() {
+    const response = await fetch ("/api/categories");
+    const categories = await response.json();
+
+    //Finds the select element where the options will be inserted
+    const categorySelect = document.querySelector("#input-category");
+
+    for (let i = 0; i < categories.length; i++) {
+        const category = categories [i];
+
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = category.name;
+
+        categorySelect.appendChild(option);
+    }
+    
+}

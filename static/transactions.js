@@ -74,3 +74,25 @@ async function loadCategoryOptions() {
     }
     
 }
+
+// Submit Button of the form to create a new transaction
+document.querySelector("#add-transaction-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const newTransaction = {
+        date: document.querySelector("#input-date").value,
+        description: document.querySelector("#input-description").value,
+        amount: document.querySelector("#input-amount").value,
+        account_id: document.querySelector("#input-account").value,
+        category_id: document.querySelector("#input-category").value,
+    };
+
+    await fetch ("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify(newTransaction),
+    });
+
+    // Reload the page so that the new transaction appears
+    location.reload();
+});

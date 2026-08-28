@@ -1,6 +1,8 @@
 // Runs when the page is loaded
 document.addEventListener("DOMContentLoaded", function() { 
 loadTransactions();
+loadAccountOptions();
+loadCategoryOptions();
 });
 
 // Fetches the transaction data from the API and fills the table
@@ -32,4 +34,23 @@ async function loadTransactions() {
     // Converts normal Table into DataTable
     $("#transactions-table").DataTable();
 
+}
+
+// Fetches all accounts and fills dropdown for accounts
+async function loadAccountOptions() {
+    const repsonse = await fetch("/api/accounts");
+    const accounts = await repsonse.json();
+
+    //Finds the select element where the options will be inserted
+    const accountSelect = document.querySelector("#input-account");
+
+    for (let i = 0; i < accounts.length; i++) {
+        const account = accounts[i];
+
+        const option = document.createElement("option");
+        option.value = account.id;
+        option.textContent = account.name;
+
+        accountSelect.appendChild(option);
+    }
 }

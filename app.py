@@ -66,5 +66,30 @@ def get_categories():
         categories.append(category)
     return jsonify(categories)
 
+# Get /api/accounts - lists all accounts
+@app.route("/api/accounts")
+def get_accounts():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Get every accounts
+    cur.execute("SELECT id, name, type FROM accounts ORDER BY name")
+
+    rows = cur.fetchall()
+    conn.close()
+
+    # Create a dictionary for each row so it can be converted to JSON
+    accounts = []
+    for row in rows:
+        account = {
+            "id": row[0],
+            "name": row[1],
+            "type": row[2],
+        }
+        accounts.append(account)
+
+    return jsonify(accounts)
+
 if __name__ == "__main__":
     app.run(debug=True)

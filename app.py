@@ -55,6 +55,7 @@ def create_transaction():
     # Convert the euro amount into cents
     amount_cents = round(float(data["amount"]) * 100)
 
+    # Adds a row in transactions with corresponding values
     cur.execute(
         "INSERT INTO transactions (transaction_date, description, amount_cents, account_id, category_id)"
         "VALUES (:date, :description, :amount_cents, :account_id, :category_id)",
@@ -120,6 +121,39 @@ def get_accounts():
         accounts.append(account)
 
     return jsonify(accounts)
+
+# GET /api/summary/by-category?month=YYYY-MM - Spending and income totals per category.
+@app.route("/api/summary/by-category")
+def get_summary_by_category():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Read the month from the URL
+    month = request.args.get("month")
+
+    # Sum the amount for each category in the concerned month
+    cur.execute(
+        "SELECT categories.name, SUM(transactions.amount_cents) "
+        "FROM transactions, categories "
+        "WHERE transactions.category_id = categories.id "
+        "AND transactions.transaction_date LIKE :month_pattern "
+        "GROUP BY categories.name",
+        {"month_pattern": month + "%"}
+    )
+
+    rows = cur.fetchall()
+    conn.close()
+
+    #Create a dictionary for each row so it can be converted to JSON
+    summary = []
+    for row in rows:
+        entry = {
+            "category": row[0],
+            "total_cents": row[1],
+        }
+        summary.append(entry)
+    return jsonify(summary)
 
 if __name__ == "__main__":
     app.run(debug=True)

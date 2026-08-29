@@ -13,6 +13,11 @@ def home():
 def transactions_page():
     return render_template("transactions.html")
 
+# Shows the charts page
+@app.route("/charts")
+def charts_page():
+    return render_template("charts.html")
+
 # GET/api/transactions - lists all transactions with account- and category names
 @app.route("/api/transactions")
 def get_transactions():
@@ -22,7 +27,7 @@ def get_transactions():
 
     # Get every transaction with the account and category name
     cur.execute(
-        "SELECT transactions.id, transactions.transaction_date, transactions.description, transactions.amount_cents," "accounts.name, categories.name "
+        "SELECT transactions.id, transactions.transaction_date, transactions.description, transactions.amount_cents, accounts.name, categories.name "
         "FROM transactions, accounts, categories "
         "WHERE transactions.account_id = accounts.id AND transactions.category_id = categories.id "
         "ORDER BY transactions.transaction_date DESC")
@@ -156,6 +161,38 @@ def get_summary_by_category():
             "total_cents": row[1],
         }
         summary.append(entry)
+    return jsonify(summary)
+
+# GET /api/summary/monthly - Income versus expenses per month
+@app.route("/api/summary/monthly")
+def get_summary_monthly():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Group all transactions by month and sum income and expenses
+    cur.execute(
+        "SELECT substr(transaction_date, 1, 7) AS month, "
+        "SUM(CASE WHEN amount_cents > 0 THEN amount_cents ELSE 0 END), "
+        "SUM(CASE WHEN amount_cents < 0 THEN amount_cents ELSE 0 END) "
+        "FROM transactions "
+        "GROUP BY month "
+        "ORDER BY month"
+    )
+
+    rows = cur.fetchall()
+    conn.close()
+    
+    #Create a dictionary for each row so it can be converted to JSON
+    summary = []
+    for row in rows:
+        entry = {
+            "month": row[0],
+            "income_cents": row[1],
+            "expenses_cents": row [2],
+        }
+        summary.append(entry)
+
     return jsonify(summary)
 
 if __name__ == "__main__":

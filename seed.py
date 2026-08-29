@@ -14,7 +14,8 @@ cur.execute("INSERT INTO accounts (name, type, opening_balance_cents) VALUES ('G
 cur.execute("INSERT INTO accounts (name, type, opening_balance_cents) VALUES ('Savings', 'savings', 500000)")
 
 # Creates Five categories
-cur.execute("INSERT INTO categories (name, kind) VALUES ('Income', 'income')")
+cur.execute("INSERT INTO categories (name, kind) VALUES ('Salary', 'income')")
+cur.execute("INSERT INTO categories (name, kind) VALUES ('Other Earnings', 'income')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Groceries & Household', 'expense')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Housing', 'expense')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Transport', 'expense')")
@@ -37,7 +38,7 @@ def get_category_id(name):
 # One entry per transaction, grouped by month
 transactions_by_month = {
     "2026-06": [
-        {"date": "2026-06-01", "description": "Salary", "amount": 3200.00, "account": "Giro","category": "Income"},
+        {"date": "2026-06-01", "description": "Salary", "amount": 3200.00, "account": "Giro","category": "Salary"},
         {"date": "2026-06-01", "description": "Rent", "amount": -950.00, "account": "Giro", "category": "Housing"},
         {"date": "2026-06-02", "description": "MPreis", "amount": -64.20, "account": "Giro", "category":"Groceries & Household"},
         {"date": "2026-06-04", "description": "Cinema", "amount": -24.00, "account":"Giro", "category": "Leisure"},
@@ -49,24 +50,24 @@ transactions_by_month = {
         {"date": "2026-06-18", "description": "Gym", "amount": -45.00, "account": "Giro", "category": "Leisure"},
     ],
     "2026-07": [
-        {"date": "2026-07-01", "description": "Salary", "amount": 3200.00, "account": "Giro", "category": "Income"},
+        {"date": "2026-07-01", "description": "Salary", "amount": 3200.00, "account": "Giro", "category": "Salary"},
         {"date": "2026-07-01", "description": "Rent", "amount": -950.00, "account": "Giro", "category": "Housing"},
         {"date": "2026-07-03", "description": "MPreis", "amount": -58.70, "account": "Giro", "category": "Groceries & Household"},
         {"date": "2026-07-05", "description": "ÖBB", "amount": -89.00, "account": "Giro", "category": "Transport"},
         {"date": "2026-07-08", "description": "Billa", "amount": -88.50, "account": "Giro", "category": "Groceries & Household"},
         {"date": "2026-07-10", "description": "Cinema", "amount": -24.00, "account": "Giro", "category": "Leisure"},
         {"date": "2026-07-16", "description": "Fuel", "amount": -57.00, "account": "Savings", "category": "Transport"},
-        {"date": "2026-07-24", "description": "Dividend payment", "amount": 45.00, "account": "Savings", "category": "Income"},   
+        {"date": "2026-07-24", "description": "Dividend payment", "amount": 45.00, "account": "Savings", "category": "Other Earnings"},   
     ],
     "2026-08": [
-        {"date": "2026-08-01", "description": "Salary", "amount": 3200.00, "account": "Giro", "category": "Income"},
+        {"date": "2026-08-01", "description": "Salary", "amount": 3200.00, "account": "Giro", "category": "Salary"},
         {"date": "2026-08-01", "description": "Rent", "amount": -950.00, "account": "Giro", "category": "Housing"},
         {"date": "2026-08-03", "description": "MPreis", "amount": -64.20, "account": "Giro", "category": "Groceries & Household"},
         {"date": "2026-08-07", "description": "ÖBB", "amount": -89.00, "account": "Giro", "category": "Transport"},
         {"date": "2026-08-07", "description": "Billa", "amount": -112.85, "account": "Giro", "category": "Groceries & Household"},
         {"date": "2026-08-14", "description": "Restaurant Wal", "amount": -97.50, "account": "Giro", "category": "Leisure"},
         {"date": "2026-08-18", "description": "Gym", "amount": -111.50, "account": "Giro", "category": "Leisure"},
-        {"date": "2026-08-22", "description": "Dividend payout", "amount": 52.00, "account": "Savings", "category": "Income"},
+        {"date": "2026-08-22", "description": "Dividend payout", "amount": 52.00, "account": "Savings", "category": "Other Earnings"},
     ],
 }
 

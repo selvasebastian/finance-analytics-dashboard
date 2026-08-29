@@ -2,6 +2,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     loadCategoryChart();
     loadIncomeChart();
+    loadMonthlyChart();
 });
 
 // Fetches the category summary and draws a pie chart (Spending by category)
@@ -65,7 +66,45 @@ async function loadIncomeChart() {
             labels: labels, 
             datasets: [{
                data:values,
-             }]
+            }]
+        },
+    });
+}
+
+// Fetches the monthly summary and draws a bar chart (Income vs. Expenses)
+async function loadMonthlyChart() {
+    const response = await fetch("/api/summary/monthly");
+    const summary = await response.json(); 
+
+    const labels = [];
+    const incomeValues = [];
+    const expenseValues = [];
+
+    for (let i = 0; i < summary.length; i++) {
+        const entry = summary[i];
+
+        labels.push(entry.month);
+        incomeValues.push(entry.income_cents / 100);
+        expenseValues.push(Math.abs(entry.expenses_cents / 100));
+    }
+ 
+    // Finds the canvas elements and draws the bar chart
+    const canvas = document.querySelector("#monthly-chart");
+
+    new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: labels, 
+            datasets: [
+                {
+                    label: "Income",
+                    data: incomeValues,
+                },
+                {
+                    label: "Expenses",
+                    data: expenseValues,
+                }
+            ]
         },
     });
 }

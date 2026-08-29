@@ -195,5 +195,39 @@ def get_summary_monthly():
 
     return jsonify(summary)
 
+# GET /api/budgets?month=YYYY-MM - reads the budget for the corresponding month
+@app.route("/api/budgets")
+def get_budgets():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Read the month from the URL
+    month = request.args.get("month")
+
+    # Get the budgets for the for the concerned month with the category name
+    cur.execute(
+        "SELECT budgets.id, budgets.limit_amount_cents, budgets.category_id, categories.name "
+        "FROM budgets "
+        "LEFT JOIN categories ON budgets.category_id = categories.id "
+        "WHERE budgets.month = :month",
+        {"month": month}
+    )
+
+    rows = cur.fetchall()
+    conn.close()
+
+    # Create a dictionary for each row so it can be converted to JSON
+    budgets = []
+    for row in rows:
+        budget = {
+            "id": row[0],
+            "limit_cents": row[1],
+            "category_id": row[2],
+            "category": row[3],
+        }
+        budgets.append(budget)
+    return jsonify(budgets)
+
 if __name__ == "__main__":
     app.run(debug=True)

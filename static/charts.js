@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadCategoryChart();
     loadIncomeChart();
     loadMonthlyChart();
+    loadTrendsChart();
 });
 
 // Fetches the category summary and draws a pie chart (Spending by category)
@@ -102,6 +103,38 @@ async function loadMonthlyChart() {
                 },
                 {
                     label: "Expenses",
+                    data: expenseValues,
+                }
+            ]
+        },
+    });
+}
+
+// Fetches the monthly summary and draws a line chart of spending over time
+async function loadTrendsChart() {
+    const response = await fetch("/api/summary/monthly");
+    const summary = await response.json(); 
+
+    const labels = [];
+    const expenseValues = [];
+
+    for (let i = 0; i < summary.length; i++) {
+        const entry = summary[i];
+
+        labels.push(entry.month);
+        expenseValues.push(Math.abs(entry.expenses_cents / 100));
+    }
+ 
+    // Finds the canvas elements and draws the line chart
+    const canvas = document.querySelector("#trends-chart");
+
+    new Chart(canvas, {
+        type: "line",
+        data: {
+            labels: labels, 
+            datasets: [
+                {
+                    label: "Spending per Month",
                     data: expenseValues,
                 }
             ]

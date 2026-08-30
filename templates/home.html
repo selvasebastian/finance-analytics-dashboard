@@ -20,7 +20,18 @@
 </nav>
 
 <div class="container mt-4">
-    <h1>Home</h1>
+    <h1>Finance Analytics Dashboard</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h2>Net Worth</h2>
+            <canvas id="home-networth-chart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <h2>Monthly Budget Spent</h2>
+            <canvas id="home-budget-chart"></canvas>
+        </div>
+    </div>
 
     <h2>Last 5 Transactions</h2>
     <table id="recent-table" class="table table-striped">
@@ -37,6 +48,9 @@
         </tbody>
     </table>
 </div>
+
+<!--Chart.js for the graphs-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!--JavaScript that loads the recent transactions.-->
 <script src="{{ url_for('static', filename='home.js')}}"></script>

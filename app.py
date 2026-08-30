@@ -229,5 +229,37 @@ def get_budgets():
         budgets.append(budget)
     return jsonify(budgets)
 
+# PUT /api/budgets?month=YYYY-MM - sets the budget for the corresponding month
+@app.route("/api/budgets", methods=["PUT"])
+def set_budget():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Read the JSON data
+    data = request.get_json()
+
+    # Deletes the budget for this month and category (if one exists)
+    cur.execute(
+        "DELETE FROM budgets WHERE month = :month AND category_id IS :category_id",
+        {"month": data["month"], "category_id": data.get("category_id")}
+    )
+
+    # Inserts the new budget
+    cur.execute(
+        "INSERT INTO budgets (month, limit_amount_cents, category_id) "
+        "VALUES (:month, :limit, :category_id)",
+        {
+            "month": data["month"],
+            "limit": data["limit_cents"],
+            "category_id": data.get("category_id"),
+        }
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Budget saved"})
+
 if __name__ == "__main__":
     app.run(debug=True)

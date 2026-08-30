@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadIncomeChart();
     loadMonthlyChart();
     loadTrendsChart();
+    loadOverallBudgetChart();
 });
 
 // Fetches the category summary and draws a pie chart (Spending by category)
@@ -138,6 +139,50 @@ async function loadTrendsChart() {
                     data: expenseValues,
                 }
             ]
+        },
+    });
+}
+
+// Fetches the budgets and monthly spending and draws the overall budget chart
+async function loadOverallBudgetChart() {
+    const budgetsResponse = await fetch("/api/budgets?month=2026-08");
+    const budgets = await budgetsResponse.json();
+
+    const monthlyResponse = await fetch("/api/summary/monthly");
+    const monthlySummary = await monthlyResponse.json();
+
+    // Find the overall budget
+    let overallLimitCents = 0;
+    for (let i = 0; i < budgets.length; i++) {
+        const budget = budgets[i];
+
+        if (budget.category_id === null) {
+            overallLimitCents = budget.limit_cents;
+        }
+    }
+
+    // Find how much was spent in August
+    let spentCents = 0;
+    for (let i = 0; i < monthlySummary.length; i++) {
+        const entry = monthlySummary[i];
+
+        if (entry.month === "2026-08") {
+            spentCents = Math.abs(entry.expenses_cents);
+        }
+    }
+
+    const spentEuros = spentCents / 100;
+    const remainingEuros = Math.max(0, (overallLimitCents - spentCents) /100);
+
+    const canvas = document.querySelector("#overall-budget-chart");
+
+    new Chart(canvas, {
+        type: "pie",
+        data: {
+            labels: ["Spent", "Remaining"],
+            datasets: [{
+                data: [spentEuros, remainingEuros]
+            }],
         },
     });
 }

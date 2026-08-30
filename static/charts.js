@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadMonthlyChart();
     loadTrendsChart();
     loadOverallBudgetChart();
+    loadCategoryBudgetChart();
 });
 
 // Fetches the category summary and draws a pie chart (Spending by category)
@@ -174,6 +175,7 @@ async function loadOverallBudgetChart() {
     const spentEuros = spentCents / 100;
     const remainingEuros = Math.max(0, (overallLimitCents - spentCents) /100);
 
+    // Finds the canvs element and draws the pie chart
     const canvas = document.querySelector("#overall-budget-chart");
 
     new Chart(canvas, {
@@ -183,6 +185,63 @@ async function loadOverallBudgetChart() {
             datasets: [{
                 data: [spentEuros, remainingEuros]
             }],
+        },
+    });
+}
+
+// Fetches the budgets and category spending and draws a bar chart per category
+async function loadCategoryBudgetChart() {
+    const budgetsResponse = await fetch("/api/budgets?month=2026-08");
+    const budgets = await budgetsResponse.json();
+
+    const categoryResponse = await fetch("/api/summary/by-category?month=2026-08");
+    const categorySummary = await categoryResponse.json();
+
+    const labels = [];
+    const limitValues = [];
+    const spentValues = [];
+
+    // Loop through every budget, skip the overall one and the matching category
+    for (let i = 0; i < budgets.length; i++) {
+        const budget = budgets[i];
+
+        //Skip the overall budget
+        if (budget.category_id === null) {
+            continue;
+        }
+
+        // Find how much was spent in a category
+        let spentCents = 0;
+        for (let a = 0; a < categorySummary.length; a++) {
+            const entry = categorySummary[a];
+
+            if(entry.category === budget.category) {
+                spentCents = Math.abs(entry.total_cents);
+            }
+        }
+
+        labels.push(budget.category);
+        limitValues.push(budget.limit_cents / 100);
+        spentValues.push(spentCents / 100);
+    }
+
+    // Finds the canvas element and draws the bar chart
+    const canvas = document.querySelector("#category-budget-chart");
+
+    new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Budget",
+                    data: limitValues,
+                },
+                {
+                    label: "Spent",
+                    data: spentValues,
+                },
+            ],
         },
     });
 }

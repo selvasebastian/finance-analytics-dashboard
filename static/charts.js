@@ -247,8 +247,32 @@ async function loadCategoryBudgetChart() {
     });
 }
 
-// Fetches the budgets and category spending and draws a bar chart per category
+// Fetches account balances and draws a pie chart of the net worth
 async function loadNetWorthChart() {
-    const budgetsResponse = await fetch("/api/summary/networth");
+    const netWorthResponse = await fetch("/api/summary/net-worth");
+    const netWorth = await netWorthResponse.json();
 
+    const labels = [];
+    const values = [];
+
+    // Get account names and their balances
+    for (let i = 0; i < netWorth.length; i++) {
+        const entry = netWorth[i];
+
+        labels.push(entry.account);
+        values.push(entry.balance_cents / 100);
+    }
+
+    // Finds the canvas element and draws the pie chart
+    const canvas = document.querySelector("#networth-chart");
+
+    new Chart(canvas, {
+        type: "pie",
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+            }],
+        },
+    });
 }

@@ -112,8 +112,11 @@ def get_accounts():
     conn = sqlite3.connect("finance.db")
     cur = conn.cursor()
 
-    # Get every accounts
-    cur.execute("SELECT id, name, type FROM accounts ORDER BY name")
+    # Get every account with its balance
+    cur.execute("SELECT accounts.id, accounts.name, accounts.type, accounts.opening_balance_cents + COALESCE(SUM(transactions.amount_cents), 0) "
+                "FROM accounts "
+                "LEFT JOIN transactions ON transactions.account_id = accounts.id "
+                "GROUP BY accounts.id")
 
     rows = cur.fetchall()
     conn.close()
@@ -125,6 +128,7 @@ def get_accounts():
             "id": row[0],
             "name": row[1],
             "type": row[2],
+            "balance_cents": row[3],
         }
         accounts.append(account)
 

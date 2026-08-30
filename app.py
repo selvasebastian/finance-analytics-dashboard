@@ -6,7 +6,7 @@ app = Flask(__name__)
 # Homepage
 @app.route("/")
 def home():
-    return "Dashboard is running"
+    return render_template("home.html")
 
 # Shows the transactions page
 @app.route("/transactions")

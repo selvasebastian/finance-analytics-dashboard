@@ -265,5 +265,34 @@ def set_budget():
 
     return jsonify({"message": "Budget saved"})
 
+# GET /api/summary/net-worth - balance per account
+@app.route("/api/summary/net-worth")
+def get_net_worth():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Get every account with its balance
+    cur.execute(
+        "SELECT accounts.name, accounts.opening_balance_cents + COALESCE(SUM(transactions.amount_cents), 0) "
+        "FROM accounts "
+        "LEFT JOIN transactions ON transactions.account_id = accounts.id "
+        "GROUP BY accounts.id"
+        )
+
+    rows = cur.fetchall()
+    conn.close()
+
+    # Create a dictionary for each row so it can be converted to JSON
+    net_worth = []
+    for row in rows:
+        entry = {
+            "account": row[0],
+            "balance_cents": row[1],
+        }
+        net_worth.append(entry)
+
+    return jsonify(net_worth)
+
 if __name__ == "__main__":
     app.run(debug=True)

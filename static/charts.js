@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadTrendsChart();
     loadOverallBudgetChart();
     loadCategoryBudgetChart();
+    loadNetWorthChart();
 });
 
 // Fetches the category summary and draws a pie chart (Spending by category)
@@ -175,7 +176,7 @@ async function loadOverallBudgetChart() {
     const spentEuros = spentCents / 100;
     const remainingEuros = Math.max(0, (overallLimitCents - spentCents) /100);
 
-    // Finds the canvs element and draws the pie chart
+    // Finds the canvas element and draws the pie chart
     const canvas = document.querySelector("#overall-budget-chart");
 
     new Chart(canvas, {
@@ -244,4 +245,10 @@ async function loadCategoryBudgetChart() {
             ],
         },
     });
+}
+
+// Fetches the budgets and category spending and draws a bar chart per category
+async function loadNetWorthChart() {
+    const budgetsResponse = await fetch("/api/summary/networth");
+
 }

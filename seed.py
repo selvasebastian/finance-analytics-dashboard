@@ -13,13 +13,15 @@ cur.execute("DELETE FROM accounts")
 cur.execute("INSERT INTO accounts (name, type, opening_balance_cents) VALUES ('Giro', 'checking', 150000)")
 cur.execute("INSERT INTO accounts (name, type, opening_balance_cents) VALUES ('Savings', 'savings', 500000)")
 
-# Creates Five categories
+# Creates eight categories
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Salary', 'income')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Other Earnings', 'income')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Groceries & Household', 'expense')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Housing', 'expense')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Transport', 'expense')")
 cur.execute("INSERT INTO categories (name, kind) VALUES ('Leisure', 'expense')")
+cur.execute("INSERT INTO categories (name, kind) VALUES ('Health', 'expense')")
+cur.execute("INSERT INTO categories (name, kind) VALUES ('Insurance', 'expense')")
 
 conn.commit()
 
@@ -27,13 +29,13 @@ conn.commit()
 def get_account_id(name):
     cur.execute("SELECT id FROM accounts WHERE name = ?", (name,))
     row = cur.fetchone()
-    return row [0]
+    return row[0]
 
 # Looks up the id of a category by its name
 def get_category_id(name):
     cur.execute("SELECT id FROM categories WHERE name = ?", (name,))
     row = cur.fetchone()
-    return row [0]
+    return row[0]
 
 # One entry per transaction, grouped by month
 transactions_by_month = {
@@ -47,7 +49,7 @@ transactions_by_month = {
         {"date": "2026-06-08", "description": "Bar Moose", "amount": -61.00, "account": "Giro", "category": "Leisure"},
         {"date": "2026-06-12", "description": "Fuel", "amount": -59.00, "account": "Savings", "category": "Transport"},
         {"date": "2026-06-15", "description": "Hofer", "amount": -74.80, "account": "Giro", "category": "Groceries & Household"},
-        {"date": "2026-06-18", "description": "Gym", "amount": -45.00, "account": "Giro", "category": "Leisure"},
+        {"date": "2026-06-18", "description": "Gym", "amount": -45.00, "account": "Giro", "category": "Health"},
     ],
     "2026-07": [
         {"date": "2026-07-01", "description": "Salary", "amount": 3200.00, "account": "Giro", "category": "Salary"},
@@ -63,10 +65,11 @@ transactions_by_month = {
         {"date": "2026-08-01", "description": "Salary", "amount": 3200.00, "account": "Giro", "category": "Salary"},
         {"date": "2026-08-01", "description": "Rent", "amount": -950.00, "account": "Giro", "category": "Housing"},
         {"date": "2026-08-03", "description": "MPreis", "amount": -64.20, "account": "Giro", "category": "Groceries & Household"},
+        {"date": "2026-08-05", "description": "Liability Insurance", "amount": -15.00, "account": "Giro", "category": "Insurance"},
         {"date": "2026-08-07", "description": "ÖBB", "amount": -89.00, "account": "Giro", "category": "Transport"},
         {"date": "2026-08-07", "description": "Billa", "amount": -112.85, "account": "Giro", "category": "Groceries & Household"},
         {"date": "2026-08-14", "description": "Restaurant Wal", "amount": -97.50, "account": "Giro", "category": "Leisure"},
-        {"date": "2026-08-18", "description": "Gym", "amount": -111.50, "account": "Giro", "category": "Leisure"},
+        {"date": "2026-08-18", "description": "Gym", "amount": -111.50, "account": "Giro", "category": "Health"},
         {"date": "2026-08-22", "description": "Dividend payout", "amount": 52.00, "account": "Savings", "category": "Other Earnings"},
     ],
 }
@@ -83,7 +86,7 @@ for month in transactions_by_month:
             "INSERT INTO transactions (transaction_date, description, amount_cents, account_id, category_id)" "VALUES (:date, :description, :amount_cents, :account_id, :category_id)", 
             {
                 "date": entry["date"],
-                "description": entry ["description"],
+                "description": entry["description"],
                 "amount_cents": amount_cents,
                 "account_id": account_id,
                 "category_id": category_id,

@@ -19,6 +19,13 @@
     </div>
 </nav>
 
+<!--"Custom" CSS to keep the date column from wrapping on smaller screens.-->
+<style>
+    #recent-table td:first-child {
+        white-space: nowrap;
+    }
+</style>
+
 <div class="container mt-4">
     <h1>Finance Analytics Dashboard</h1>
 
@@ -34,6 +41,7 @@
     </div>
 
     <h2>Last 5 Transactions</h2>
+    <div class="table-responsive">
     <table id="recent-table" class="table table-striped">
         <thead>
             <tr>
@@ -47,6 +55,7 @@
         <tbody>
         </tbody>
     </table>
+    </div>
 </div>
 
 <!--Chart.js for the graphs-->

@@ -106,3 +106,17 @@ async function loadBudgetChart() {
         },
     });
 }
+
+// Clicking the charts forward the user to the Charts page
+document.querySelector("#home-networth-chart").addEventListener("click", function () {
+    window.location.href = "/charts";
+});
+
+document.querySelector("#home-budget-chart").addEventListener("click", function () {
+    window.location.href = "/charts";
+});
+
+// Clicking the latest transactions forwards the user to the Transactions page
+document.querySelector("#recent-table").addEventListener("click", function () {
+    window.location.href = "/transactions";
+})

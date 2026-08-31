@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
 loadTransactions();
 loadAccountOptions();
 loadCategoryOptions();
+loadFilterCategoryOptions();
 });
 
 // Fetches the transaction data from the API and fills the table
@@ -104,4 +105,31 @@ document.querySelector("#reset-button").addEventListener("click", async function
     });
 
     location.reload();
+});
+
+// Fetches all categories and fills the filter dropdown
+async function loadFilterCategoryOptions() {
+    const response = await fetch ("/api/categories");
+    const categories = await response.json();
+
+    //Finds the select element where the options will be inserted
+    const filterSelect = document.querySelector("#filter-category");
+
+    for (let i = 0; i < categories.length; i++) {
+        const category = categories [i];
+
+        const option = document.createElement("option");
+        option.value = category.name;
+        option.textContent = category.name;
+
+        filterSelect.appendChild(option);
+    }
+    
+}
+
+// Filters the transaction table when a category is selected
+document.querySelector("#filter-category").addEventListener("change", function () {
+    const selectedCategory = document.querySelector("#filter-category").value;
+    const table = $("#transactions-table").DataTable();
+    table.search(selectedCategory).draw();
 });

@@ -51,7 +51,16 @@
         </div>
     </form>
 
-    <button id="reset-button" class="btn btn-danger mb-4">Reset all transactions</button>
+    <div class="row mb-4">
+        <div class="col">
+            <button id="reset-button" class="btn btn-danger mb-4">Reset all transactions</button>
+        </div>
+        <div class="col">
+            <select id="filter-category" class="form-select">
+                <option value="">Filter by category</option>
+            </select>
+        </div>
+    </div>
 
     <table id="transactions-table" class="table table-striped">
         <thead>

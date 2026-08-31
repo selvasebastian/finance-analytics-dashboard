@@ -96,3 +96,12 @@ document.querySelector("#add-transaction-form").addEventListener("submit", async
     // Reload the page so that the new transaction appears
     location.reload();
 });
+
+// Handles clicking the reset button
+document.querySelector("#reset-button").addEventListener("click", async function (){
+    await fetch("/api/reset", {
+        method: "POST",
+    });
+
+    location.reload();
+});

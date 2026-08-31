@@ -294,5 +294,21 @@ def get_net_worth():
 
     return jsonify(net_worth)
 
+# POST /api/reset - deletes all transactions so that user can clean up before entering their on transactions
+
+@app.route("/api/reset", methods=["POST"])
+def reset_transaction():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Delete every transaction
+    cur.execute("DELETE FROM transactions")
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "All transactions deleted"})
+
 if __name__ == "__main__":
     app.run(debug=True)

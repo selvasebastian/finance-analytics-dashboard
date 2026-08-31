@@ -289,6 +289,11 @@ async function loadBudgetCategoryOptions() {
     for (let i = 0; i < categories.length; i++) {
         const category = categories[i];
 
+        // Skip income categories
+        if (category.kind === "income") {
+            continue;
+        }
+
         const option = document.createElement("option");
         option.value = category.id;
         option.textContent = category.name;

@@ -1,4 +1,4 @@
-// Runs when the pag is loaded
+// Runs when the page is loaded
 document.addEventListener("DOMContentLoaded", function () {
     loadCategoryChart();
     loadIncomeChart();
@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadOverallBudgetChart();
     loadCategoryBudgetChart();
     loadNetWorthChart();
+    loadBudgetCategoryOptions();
 });
 
 // Fetches the category summary and draws a pie chart (Spending by category)
@@ -276,3 +277,49 @@ async function loadNetWorthChart() {
         },
     });
 }
+
+// Fetches all categories and fills the dropdown
+async function loadBudgetCategoryOptions() {
+    const response = await fetch ("/api/categories");
+    const categories = await response.json();
+
+    // Finds the select element where the options will be inserted
+    const categorySelect = document.querySelector("#budget-category");
+    
+    for (let i = 0; i < categories.length; i++) {
+        const category = categories[i];
+
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = category.name;
+
+        categorySelect.appendChild(option);
+    }
+}
+
+// Handles submitting the budget form
+document.querySelector("#set-budget-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const categoryId = document.querySelector("#budget-category").value;
+
+    let categoryIdToSend = categoryId;
+    if (categoryId === "") {
+        categoryIdToSend = null;
+    }
+
+    const newBudget = {
+        month: "2026-08",
+        limit_cents: Math.round(document.querySelector("#budget-limit").value * 100),
+        category_id: categoryIdToSend,
+    };
+
+    await fetch ("/api/budgets", {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(newBudget),
+    });
+
+    // Reload the page so that the new budget appears
+    location.reload();
+});

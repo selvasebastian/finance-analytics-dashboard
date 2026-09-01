@@ -86,7 +86,6 @@ http://127.0.0.1:5000
 ```
 
 ## Dependencies
-
 Backend
 - Flask 3.1.3
 
@@ -104,7 +103,9 @@ Built-in (no installation needed):
 - All five fields on the Transactions page for adding new data must obtain inputs.
 - When adding an expense at the Transactions page it is necessary to add a minus before the number, otherwise the system will interpret it wrongly and the charts will be erroneous.
 - In order to make additional categories appear in the "Budget per Category" Chart, it is necessary to set a budget on the Charts page for the corresponding category.
-- If a transaction leads to a negative balance (spending more than is available), the charts may not display this account correctly. However, this was a deliberate decision since it is possible to overdraw in account and also a normal process for some means of payment (e.g. credit cards) or short types of loans that may be added as additional means of payment in the future.
+- If a transaction leads to a negative balance (spending more than is available), the charts may not display this account correctly. However, this was a deliberate decision since it is possible to overdraw an account and also a normal process for some means of payment (e.g. credit cards) or short types of loans that may be added as additional means of payment in the future.
+- The dashboard's charts and the budget form currently use a hardcoded month (2026-08). This was a chosen simplification, because the project is built around a fixed set of sample data.
+- The application requires an active internet connection to function, although the backend runs locally. This because of the usage of Bootstrap, jQuery, DataTables.js and Chart.js.
 
 ## Potential further improvements
 - to be completed

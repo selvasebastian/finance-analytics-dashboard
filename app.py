@@ -310,5 +310,64 @@ def reset_transaction():
 
     return jsonify({"message": "All transactions deleted"})
 
+# POST /api/transactions/import - creates transactions from CSV text
+@app.route("/api/transactions/import", methods=["POST"])
+def import_transactions():
+    # Connect to database
+    conn = sqlite3.connect("finance.db")
+    cur = conn.cursor()
+
+    # Read the JSON data and expects input in form of a "csv_text" field
+    data = request.get_json()
+    csv_text = data["csv_text"]
+
+    # Split the text into individuals lines
+    lines = csv_text.strip().split("\n")
+
+    # Skip the first line
+    data_lines = lines[1:]
+
+    imported_count = 0
+    for line in data_lines:
+        # Split the line into its columns
+        columns = line.split(",")
+        date = columns[0]
+        description = columns[1]
+        amount = columns[2]
+        category = columns[3]
+        account = columns[4]
+
+        # Convert the euro amount into cents
+        amount_cents = round(float(amount) * 100)
+
+        # Look up the account id by its name
+        cur.execute("SELECT id FROM accounts WHERE name = :name", {"name": account})
+        account_row = cur.fetchone()
+        account_id = account_row[0]
+
+        # Look up the category id by its name
+        cur.execute("SELECT id FROM categories WHERE name = :name", {"name": category})
+        category_row = cur.fetchone()
+        category_id = category_row[0]
+
+        # Insert the transaction
+        cur.execute(
+            "INSERT INTO transactions (transaction_date, description, amount_cents, account_id, category_id) "
+            "VALUES (:date, :description, :amount_cents, :account_id, :category_id)",
+            {
+                "date": date,
+                "description": description,
+                "amount_cents": amount_cents,
+                "account_id": account_id,
+                "category_id": category_id, 
+            }
+        )
+        imported_count = imported_count + 1
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": str(imported_count) + " transactions imported"})
+
 if __name__ == "__main__":
     app.run(debug=True)

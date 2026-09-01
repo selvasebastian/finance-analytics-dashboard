@@ -13,10 +13,11 @@ Core Minimum Viable Product (MVP)
 - Manual entry form and CSV import
 - Spending by category, income vs. expenses charts
 - Overall monthly budget and per-category budgets
-
-Planned, not part of the MVP
 - Spending trends over time
-- Account comparison and net worth chart
+
+Optional (if time is available)
+- Comparison of income and expenses accross different accounts (Update: dropped, not implemented)
+- Net worth chart
 
 ## Data model
 Tables: accounts, categories, transactions, budgets
@@ -51,4 +52,59 @@ Expected columns: date, description, amount, category, account
 - category and account: must match existing entries by name
 
 ## Setup
-to be completed
+1. Clone the repository:
+```
+git clone https://github.com/selvasebastian/finance-analytics-dashboard
+cd finance-analytics-dashboard
+```
+
+2. Create and activate a virtual environment:
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install dependencies:
+```
+pip install flask
+```
+
+4. Set up the database:
+```
+sqlite3 finance.db < schema.sql
+python3 seed.py
+```
+
+5. Start the server:
+```
+python3 app.py
+```
+
+6. Open the app in a browser:
+```
+http://127.0.0.1:5000
+```
+
+## Dependencies
+
+Backend
+- Flask 3.1.3
+
+Frontend
+- Bootstrap 5.3.0
+- jQuery 3.7.0
+- DataTables.js 1.13.6
+- Chart.js
+
+Built-in (no installation needed):
+- SQLite
+
+## Manual/ Important Notes
+- The system will come with predefined data. By pressing "Reset all transactions" on the transactions page. These predefined transactions will be deleted, the charts reset and the user can start entering their data. However, the start values for the accounts will not be reset. If wished this values can become zero by entering two expenses that will make the account balance of each of the accounts to zero.
+- All five fields on the Transactions page for adding new data must obtain inputs.
+- When adding an expense at the Transactions page it is necessary to add a minus before the number, otherwise the system will interpret it wrongly and the charts will be erroneous.
+- In order to make additional categories appear in the "Budget per Category" Chart, it is necessary to set a budget on the Charts page for the corresponding category.
+- If a transaction leads to a negative balance (spending more than is available), the charts may not display this account correctly. However, this was a deliberate decision since it is possible to overdraw in account and also a normal process for some means of payment (e.g. credit cards) or short types of loans that may be added as additional means of payment in the future.
+
+## Potential further improvements
+- to be completed

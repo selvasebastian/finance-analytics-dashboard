@@ -100,12 +100,13 @@ Built-in (no installation needed):
 
 ## Manual/ Important Notes
 - The system will come with predefined data. By pressing "Reset all transactions" on the transactions page. These predefined transactions will be deleted, the charts reset and the user can start entering their data. However, the start values for the accounts will not be reset. If wished this values can become zero by entering two expenses that will make the account balance of each of the accounts to zero.
-- All five fields on the Transactions page for adding new data must obtain inputs.
+- All five fields on the Transactions page for adding new data must obtain inputs. The date and amount fields only accept valid input formats.
 - When adding an expense at the Transactions page it is necessary to add a minus before the number, otherwise the system will interpret it wrongly and the charts will be erroneous.
 - In order to make additional categories appear in the "Budget per Category" Chart, it is necessary to set a budget on the Charts page for the corresponding category.
 - If a transaction leads to a negative balance (spending more than is available), the charts may not display this account correctly. However, this was a deliberate decision since it is possible to overdraw an account and also a normal process for some means of payment (e.g. credit cards) or short types of loans that may be added as additional means of payment in the future.
 - The dashboard's charts and the budget form currently use a hardcoded month (2026-08). This was a chosen simplification, because the project is built around a fixed set of sample data.
 - The application requires an active internet connection to function, although the backend runs locally. This because of the usage of Bootstrap, jQuery, DataTables.js and Chart.js.
+- The "CSV import" does not validate the input. If a row contains a category or account name that does not exist in the system or an invalid amount format or anything else that isn't according to the defined input, the import will fail. Furthermore, it must be said that this application contains no real CSV input and more a field where users can enter data in CSV style.
 
 ## Potential further improvements
 - to be completed

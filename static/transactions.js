@@ -133,3 +133,17 @@ document.querySelector("#filter-category").addEventListener("change", function (
     const table = $("#transactions-table").DataTable();
     table.search(selectedCategory).draw();
 });
+
+// Handles clicking the import button
+document.querySelector("#import-button").addEventListener("click", async function () {
+    const csvText = document.querySelector("#csv-input").value;
+
+    await fetch("/api/transactions/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csv_text: csvText }),
+    });
+    
+location.reload();
+
+});

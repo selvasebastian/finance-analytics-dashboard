@@ -325,7 +325,7 @@ def import_transactions():
     lines = csv_text.strip().split("\n")
 
     # Skip the first line
-    data_lines = lines[1:]
+    data_lines = lines
 
     imported_count = 0
     for line in data_lines:

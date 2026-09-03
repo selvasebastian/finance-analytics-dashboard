@@ -2,6 +2,10 @@
 
 A web application that helps users understand their personal finances through an interactive transaction table and summary visualizations (spending by category, income vs. expenses, and budget tracking).
 
+## AI Disclaimer
+Artificial intelligence tools were used in the development of this portfolio. Claude (Anthropic) was used to weigh different alternatives, explore possible solutions, and suggest approaches to problems. It was also used to check the code for logical errors, typos and to explain various aspects and features of the programming languages used. Furthermore, it was used to help planning the approaches to create different code elements and to serve as a guide for understanding how certain things work. Claude further assisted with debugging and with checking spelling and writing errors across various documents and was used to check whether the results met the requirements of the assignment. Claude was also used to reformulate statements in the artifacts that have to be handed in alongside the code. Google’s AI-assisted search feature in the browser (not Gemini) was also used to answer questions about how certain things work in programming languages and how to implement certain features. The code itself was written and checked by the author, who takes sole responsibility for it.
+
+
 ## Tech stack
 - Frontend: HTML, CSS, Bootstrap, DataTables.js, Chart.js
 - Backend: Python, Flask
@@ -88,15 +92,26 @@ http://127.0.0.1:5000
 ## Dependencies
 Backend
 - Flask 3.1.3
+- Python 3
+- JSON API, 11 routes
+- JavaScript
 
 Frontend
 - Bootstrap 5.3.0
 - jQuery 3.7.0
 - DataTables.js 1.13.6
 - Chart.js
+- CSS
+- HTML
+
+Tools
+- GitHub
+- Microsoft Visual Studio Code
+- Google Search aid AI in the browser (see AI Disclaimer above)
+- ClaudeAI (see AI Disclaimer below)
 
 Built-in (no installation needed):
-- SQLite
+- SQLite (Database)
 
 ## Manual/ Important Notes
 - The system will come with predefined data. By pressing "Reset all transactions" on the transactions page. These predefined transactions will be deleted, the charts reset and the user can start entering their data. However, the start values for the accounts will not be reset. If wished this values can become zero by entering two expenses that will make the account balance of each of the accounts to zero.

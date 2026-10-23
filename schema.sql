@@ -1,3 +1,9 @@
+-- Deletes old tables first
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS budgets;
+
 -- Current account balance is not saved, but later calculated (opening_balance_cents + sum all transactions)
 CREATE TABLE accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

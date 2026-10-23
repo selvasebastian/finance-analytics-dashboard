@@ -6,13 +6,33 @@ loadCategoryOptions();
 loadFilterCategoryOptions();
 });
 
+// Shows a succes or error message above the form
+function showMessage(text, isError){
+    const messageBox = document.querySelector("#message");
+    messageBox.textContent = text;
+
+    if (isError) {
+        messageBox.className = "alert alert-danger";
+    } else {
+        messageBox.className = "alert alert-success";
+    }
+}
+
 // Fetches the transaction data from the API and fills the table
 async function loadTransactions() {
     const response = await fetch("/api/transactions");
     const transactions = await response.json();
 
-    // Finds the <tbody> element where the rows will be insterted
+    // Removes the old DataTable (if there is one), so that the table can be built again
+    if ($.fn.DataTable.isDataTable("#transactions-table")) {
+        $("#transactions-table").DataTable().destroy();
+    }
+
+    // Finds the <tbody> element where the rows will be inserted
     const tableBody = document.querySelector("#transactions-table tbody");
+
+    // Deletes old rows
+    tableBody.innerHTML = "";
 
     for (let i = 0; i < transactions.length; i++) {
         const transaction = transactions[i];
@@ -88,23 +108,35 @@ document.querySelector("#add-transaction-form").addEventListener("submit", async
         category_id: document.querySelector("#input-category").value,
     };
 
-    await fetch ("/api/transactions", {
+    const response = await fetch("/api/transactions", {
         method: "POST",
-        headers: { "Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newTransaction),
     });
+    const result = await response.json();
 
-    // Reload the page so that the new transaction appears
-    location.reload();
+    // Shows the error message if something went wrong
+    if (result.error) {
+        showMessage(result.error, true);
+        return;
+    }
+
+    // Shows a success message, epmties the form and reloads the table
+    showMessage("Transaction added.", false);
+    document.querySelector("#add-transaction-form").reset();
+    loadTransactions();
 });
 
 // Handles clicking the reset button
 document.querySelector("#reset-button").addEventListener("click", async function (){
-    await fetch("/api/reset", {
+    const response = await fetch("/api/reset", {
         method: "POST",
     });
+    const result = await response.json();
 
-    location.reload();
+    // Shows succes message and loads table again
+    showMessage(result.message, false);
+    loadTransactions();
 });
 
 // Fetches all categories and fills the filter dropdown
@@ -138,12 +170,21 @@ document.querySelector("#filter-category").addEventListener("change", function (
 document.querySelector("#import-button").addEventListener("click", async function () {
     const csvText = document.querySelector("#csv-input").value;
 
-    await fetch("/api/transactions/import", {
+    const response = await fetch("/api/transactions/import", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ csv_text: csvText }),
+        headers :{"Content-Type": "application/json"},
+        body: JSON.stringify({ csv_text: csvText })
     });
-    
-location.reload();
+    const result = await response.json();
 
+    // Shows the error message if something went wrong
+    if (result.error) {
+        showMessage(result.error, true);
+        return;
+    }
+    
+    // Shows a success message, epmties the form and reloads the table
+    showMessage(result.message, false);
+    document.querySelector("#csv-input").value = "";
+    loadTransactions();
 });

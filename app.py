@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -8,6 +9,59 @@ def get_connection():
     conn = sqlite3.connect("finance.db")
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
+
+# Checks if a text is a real date
+def is_valid_date(date_text):
+    try:
+        datetime.strptime(date_text, "%Y-%m-%d")
+        return True
+    except (ValueError, TypeError):
+        return False
+
+#Checks all values of one transaction before it is saved
+def validate_transaction(cur, date, description, amount, account_id, category_id):
+    if not is_valid_date(date):
+        return None, "Invalid date format. Please use YYYY-MM-DD."
+
+    if description.strip() == "":
+        return None, "Description cannot be empty."
+    if len(description.strip()) > 100:
+        return None, "Description cannot be longer than 100 characters."
+
+    # Convert amount into cents
+    try:
+        amount_cents = round(float(amount) * 100)
+    except (ValueError):
+        return None, "Amount must be a number."
+    if amount_cents == 0:
+        return None, "Amount cannot be zero."
+
+    # Check if the account exists
+    cur.execute("SELECT id FROM accounts WHERE id = :id", {"id": account_id})
+    if cur.fetchone() is None:
+        return None, "Account does not exist."
+
+    # Check if the category exists
+    cur.execute("SELECT kind FROM categories WHERE id = :id", {"id": category_id})
+    category_row = cur.fetchone()
+    if category_row is None:
+        return None, "Category does not exist."
+
+    # Sign is determined by the category
+    if category_row[0] =="expense":
+        amount_cents = -abs(amount_cents)
+    else:
+        amount_cents = abs(amount_cents)
+
+    transaction = {
+        "date": date,
+        "description": description.strip(),
+        "amount_cents": amount_cents,
+        "account_id": account_id,
+        "category_id": category_id,
+    }
+
+    return transaction, None
 
 # Homepage
 @app.route("/")
@@ -67,20 +121,17 @@ def create_transaction():
     # Read the JSON data
     data = request.get_json()
 
-    # Convert the euro amount into cents
-    amount_cents = round(float(data["amount"]) * 100)
+    # Check values and set minus sign for expenses
+    transaction, error = validate_transaction(cur, data["date"], data["description"], data["amount"], data["account_id"], data["category_id"])
+    if error is not None:
+        conn.close()
+        return jsonify({"error": error})
 
-    # Adds a row in transactions with corresponding values
+    # Adds a row in transaction with the validated values
     cur.execute(
-        "INSERT INTO transactions (transaction_date, description, amount_cents, account_id, category_id)"
+        "INSERT INTO transactions (transaction_date, description, amount_cents, account_id, category_id) "
         "VALUES (:date, :description, :amount_cents, :account_id, :category_id)",
-        {
-        "date": data["date"],
-        "description": data["description"],
-        "amount_cents": amount_cents,
-        "account_id": data["account_id"],
-        "category_id": data ["category_id"],
-        }
+        transaction
     )
 
     conn.commit()

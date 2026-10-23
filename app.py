@@ -382,49 +382,62 @@ def import_transactions():
     # Split the text into individuals lines
     lines = csv_text.strip().split("\n")
 
-    data_lines = lines
+    # Check every line
+    checked_transactions = []
+    line_number = 0
+    for line in lines:
+        line_number = line_number + 1
 
-    imported_count = 0
-    for line in data_lines:
-        # Split the line into its columns
-        columns = line.split(",")
-        date = columns[0]
-        description = columns[1]
-        amount = columns[2]
-        category = columns[3]
-        account = columns[4]
+        # Skip empty lines and the header line
+        if line.strip() == "" or line.startswith("date,"):
+            continue
 
-        # Convert the euro amount into cents
-        amount_cents = round(float(amount) * 100)
+        # Split the line into fields
+        fields = line.split(",")
+        if len(fields) != 5:
+            conn.close()
+            return jsonify({"error": "Line" + str(line_number) + ": needs 5 fields (date, description, amount, category, account)." })
 
-        # Look up the account id by its name
-        cur.execute("SELECT id FROM accounts WHERE name = :name", {"name": account})
+        date = fields[0].strip()
+        description = fields[1]
+        amount = fields[2].strip()
+        category_name = fields[3].strip()
+        account_name = fields[4].strip()
+
+        # Look up the account id
+        cur.execute("SELECT id FROM accounts WHERE name = :name", {"name": account_name})
         account_row = cur.fetchone()
-        account_id = account_row[0]
+        if account_row is None:
+            conn.close()
+            return jsonify({"error": "Line" + str(line_number) + ": account " + account_name + " does not exist."})
 
-        # Look up the category id by its name
-        cur.execute("SELECT id FROM categories WHERE name = :name", {"name": category})
+        # Look up the category id
+        cur.execute("SELECT id FROM categories WHERE name = :name", {"name": category_name})
         category_row = cur.fetchone()
-        category_id = category_row[0]
+        if category_row is None:
+            conn.close()
+            return jsonify({"error": "Line" + str(line_number) + ": category " + category_name + " does not exist."})
 
-        # Insert the transaction
+        # Check values
+        transaction, error = validate_transaction(cur, date, description, amount, account_row[0], category_row[0])
+        if error is not None:
+            conn.close()
+            return jsonify({"error": "Line" + str(line_number) + ": " + error})
+
+        checked_transactions.append(transaction)
+
+    # Save transactions
+    for transaction in checked_transactions:
         cur.execute(
             "INSERT INTO transactions (transaction_date, description, amount_cents, account_id, category_id) "
             "VALUES (:date, :description, :amount_cents, :account_id, :category_id)",
-            {
-                "date": date,
-                "description": description,
-                "amount_cents": amount_cents,
-                "account_id": account_id,
-                "category_id": category_id, 
-            }
+            transaction
         )
-        imported_count = imported_count + 1
 
     conn.commit()
     conn.close()
 
-    return jsonify({"message": str(imported_count) + " transactions imported"})
+    return jsonify({"message": str(len(checked_transactions)) + " transactions imported."})   
 
 if __name__ == "__main__":
     app.run(debug=True)

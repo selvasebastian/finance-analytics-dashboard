@@ -3,6 +3,12 @@ import sqlite3
 
 app = Flask(__name__)
 
+# Connects to the database
+def get_connection():
+    conn = sqlite3.connect("finance.db")
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
 # Homepage
 @app.route("/")
 def home():
@@ -22,14 +28,15 @@ def charts_page():
 @app.route("/api/transactions")
 def get_transactions():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Get every transaction with the account and category name
     cur.execute(
         "SELECT transactions.id, transactions.transaction_date, transactions.description, transactions.amount_cents, accounts.name, categories.name "
-        "FROM transactions, accounts, categories "
-        "WHERE transactions.account_id = accounts.id AND transactions.category_id = categories.id "
+        "FROM transactions "
+        "JOIN accounts ON transactions.account_id = accounts.id "
+        "JOIN categories ON transactions.category_id = categories.id "
         "ORDER BY transactions.transaction_date DESC")
 
     rows = cur.fetchall()
@@ -54,7 +61,7 @@ def get_transactions():
 @app.route("/api/transactions", methods=["POST"])
 def create_transaction():
     # Conntect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Read the JSON data
@@ -85,7 +92,7 @@ def create_transaction():
 @app.route("/api/categories")
 def get_categories():
     # Conntect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # get every category
@@ -109,7 +116,7 @@ def get_categories():
 @app.route("/api/accounts")
 def get_accounts():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Get every account with its balance
@@ -138,7 +145,7 @@ def get_accounts():
 @app.route("/api/summary/by-category")
 def get_summary_by_category():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Read the month from the URL
@@ -147,9 +154,9 @@ def get_summary_by_category():
     # Sum the amount for each category in the concerned month
     cur.execute(
         "SELECT categories.name, SUM(transactions.amount_cents) "
-        "FROM transactions, categories "
-        "WHERE transactions.category_id = categories.id "
-        "AND transactions.transaction_date LIKE :month_pattern "
+        "FROM transactions "
+        "JOIN categories ON transactions.category_id = categories.id "
+        "WHERE transactions.transaction_date LIKE :month_pattern "
         "GROUP BY categories.name",
         {"month_pattern": month + "%"}
     )
@@ -171,7 +178,7 @@ def get_summary_by_category():
 @app.route("/api/summary/monthly")
 def get_summary_monthly():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Group all transactions by month and sum income and expenses
@@ -203,7 +210,7 @@ def get_summary_monthly():
 @app.route("/api/budgets")
 def get_budgets():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Read the month from the URL
@@ -237,7 +244,7 @@ def get_budgets():
 @app.route("/api/budgets", methods=["PUT"])
 def set_budget():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Read the JSON data
@@ -269,7 +276,7 @@ def set_budget():
 @app.route("/api/summary/net-worth")
 def get_net_worth():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Get every account with its balance
@@ -299,7 +306,7 @@ def get_net_worth():
 @app.route("/api/reset", methods=["POST"])
 def reset_transaction():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Delete every transaction
@@ -314,7 +321,7 @@ def reset_transaction():
 @app.route("/api/transactions/import", methods=["POST"])
 def import_transactions():
     # Connect to database
-    conn = sqlite3.connect("finance.db")
+    conn = get_connection()
     cur = conn.cursor()
 
     # Read the JSON data and expects input in form of a "csv_text" field

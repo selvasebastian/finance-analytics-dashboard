@@ -1,13 +1,13 @@
 import sqlite3
 
 conn = sqlite3.connect("finance.db")
+conn.execute("PRAGMA foreign_keys = ON")
 cur = conn.cursor()
 
-# Deletes existing data from the table
-cur.execute("DELETE FROM transactions")
-cur.execute("DELETE FROM budgets")
-cur.execute("DELETE FROM categories")
-cur.execute("DELETE FROM accounts")
+# Creates the tables from schema.sql (old tables are deleted first)
+schema_file = open("schema.sql")
+cur.executescript(schema_file.read())
+schema_file.close()
 
 # Creates two new accounts
 cur.execute("INSERT INTO accounts (name, type, opening_balance_cents) VALUES ('Giro', 'checking', 150000)")
@@ -98,7 +98,11 @@ conn.commit()
 # Sets budget for the month August and two categories
 cur.execute("INSERT INTO budgets (month, limit_amount_cents, category_id) VALUES (:month, :limit, NULL)", {"month": "2026-08", "limit": 200000})
 cur.execute("INSERT INTO budgets (month, limit_amount_cents, category_id) VALUES (:month, :limit, :category_id)", {"month": "2026-08", "limit": 40000, "category_id": get_category_id("Groceries & Household")})
+cur.execute("INSERT INTO budgets (month, limit_amount_cents, category_id) VALUES (:month, :limit, :category_id)", {"month": "2026-08", "limit": 100000, "category_id": get_category_id("Housing")})
+cur.execute("INSERT INTO budgets (month, limit_amount_cents, category_id) VALUES (:month, :limit, :category_id)", {"month": "2026-08", "limit": 10000, "category_id": get_category_id("Transport")})
 cur.execute("INSERT INTO budgets (month, limit_amount_cents, category_id) VALUES (:month, :limit, :category_id)", {"month": "2026-08", "limit": 15000, "category_id": get_category_id("Leisure")})
+cur.execute("INSERT INTO budgets (month, limit_amount_cents, category_id) VALUES (:month, :limit, :category_id)", {"month": "2026-08", "limit": 50000, "category_id": get_category_id("Health")})
+cur.execute("INSERT INTO budgets (month, limit_amount_cents, category_id) VALUES (:month, :limit, :category_id)", {"month": "2026-08", "limit": 20000, "category_id": get_category_id("Insurance")})
 
 conn.commit()
 conn.close()

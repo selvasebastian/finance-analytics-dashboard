@@ -65,6 +65,10 @@ async function loadAccountOptions() {
     //Finds the select element where the options will be inserted
     const accountSelect = document.querySelector("#input-account");
 
+    // Deletes old options
+    accountSelect.innerHTML = '<option value="">Account</option>';
+
+
     for (let i = 0; i < accounts.length; i++) {
         const account = accounts[i];
 
@@ -125,6 +129,35 @@ document.querySelector("#add-transaction-form").addEventListener("submit", async
     showMessage("Transaction added.", false);
     document.querySelector("#add-transaction-form").reset();
     loadTransactions();
+});
+
+// Submit Button of the form to create a new account
+document.querySelector("#add-account-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const newAccount = {
+        name: document.querySelector("#account-name").value,
+        type: document.querySelector("#account-type").value,
+        opening_balance: document.querySelector("#account-opening-balance").value,
+    };
+
+    const response = await fetch("/api/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newAccount),
+    });
+    const result = await response.json();
+
+    // Shows the error message if something went wrong
+    if (result.error) {
+        showMessage(result.error, true);
+        return;
+    }
+
+    // Shows a success message, epmties the form and reloads the dropdown
+    showMessage(result.message, false);
+    document.querySelector("#add-account-form").reset();
+    loadAccountOptions();
 });
 
 // Handles clicking the reset button

@@ -62,6 +62,28 @@
         <div class="form-text">Enter the amount without a minus sign</div>
     </form>
 
+    <!--Form to add a new account-->
+    <h2>Add New Account</h2>
+    <form id="add-account-form" class="row g-2 mb-4">
+        <div class="col-12 col-md">
+            <input type="text" id="account-name" class="form-control" placeholder="Account Name" maxlength="50" required>
+        </div>
+        <div class="col-12 col-md">
+            <select id="account-type" class="form-select" required>
+                <option value="checking">Checking</option>
+                <option value="savings">Savings</option>
+                <option value="cash">Cash</option>
+                <option value="credit">Credit</option>
+            </select>
+        </div>
+        <div class="col-12 col-md">
+            <input type="number" step="0.01" id="account-opening-balance" class="form-control" placeholder="Opening Balance" required>
+        </div>
+        <div class="col-12 col-md">
+            <button type="submit" class="btn btn-primary">Add Account</button>
+        </div>
+    </form>
+
     <!--Import transactions from CSV test-->
     <h2>Import Transactions (CSV)</h2>
     <textarea id="csv-input" class="form-control mb-2" rows="4" placeholder="date,description,amount,category,account"></textarea>

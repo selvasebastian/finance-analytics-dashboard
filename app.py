@@ -192,6 +192,59 @@ def get_accounts():
 
     return jsonify(accounts)
 
+# POST /api/accounts - creates a new account
+@app.route("/api/accounts", methods=["POST"])
+def create_account():
+    # Connect to database
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Read the JSON data
+    data = request.get_json()
+    name = data["name"].strip()
+    account_type = data["type"]
+    opening_balance = data["opening_balance"]
+
+    # Check values
+    if name == "":
+        conn.close()
+        return jsonify({"error": "Account name cannot be empty."})
+    if len(name) > 50:
+        conn.close()
+        return jsonify({"error": "Account name cannot be longer than 50 characters."})
+    if account_type not in ["checking", "savings", "cash", "credit"]:
+        conn.close()
+        return jsonify({"error": "Account type does not exist."})
+
+    # Convert opening balance into cents
+    try:
+        opening_balance_cents = round(float(opening_balance) * 100)
+    except (ValueError):
+        conn.close()
+        return jsonify({"error": "Opening balance must be a number."})
+
+    # Check if the account name already exists
+    cur.execute("SELECT id FROM accounts WHERE name = :name", {"name": name})
+    if cur.fetchone() is not None:
+        conn.close()
+        return jsonify({"error": "Account name already exists."})
+
+    # Adds the new account
+    cur.execute(
+        "INSERT INTO accounts (name, type, opening_balance_cents) "
+        "VALUES (:name, :type, :opening_balance_cents)",
+        {
+            "name": name,
+            "type": account_type,
+            "opening_balance_cents": opening_balance_cents
+        }
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Account created"})
+
 # GET /api/summary/by-category?month=YYYY-MM - Spending and income totals per category.
 @app.route("/api/summary/by-category")
 def get_summary_by_category():

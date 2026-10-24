@@ -1,6 +1,14 @@
 // Month that is selected in the dropdown.
 let selectedMonth = "";
 
+// Shows the value and the EUR ticker when hover a chart
+Chart.defaults.plugins.tooltip.callbacks.label = function(context) {
+    if (context.dataset.label) {
+        return context.dataset.label + ": " + context.raw.toFixed(2) + " EUR";
+    }
+    return context.raw.toFixed(2) + " EUR";
+};
+
 // Runs when the page is loaded
 document.addEventListener("DOMContentLoaded", async function () {
 
@@ -172,6 +180,16 @@ async function loadMonthlyChart() {
                 }
             ]
         },
+        options: {
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: "EUR",
+                    },
+                },
+            },
+        },
     });
 }
 
@@ -204,9 +222,19 @@ async function loadTrendsChart() {
                 }
             ]
         },
+        options: {
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: "EUR",
+                    },
+                },
+            },
+        },
     });
 }
-
+    
 // Fetches the budgets and monthly spending and draws the overall budget chart
 async function loadOverallBudgetChart() {
     const budgetsResponse = await fetch("/api/budgets?month=" + selectedMonth);
@@ -315,6 +343,16 @@ async function loadCategoryBudgetChart() {
                     data: spentValues,
                 },
             ],
+        },
+        options: {
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: "EUR",
+                    },
+                },
+            },
         },
     });
 }

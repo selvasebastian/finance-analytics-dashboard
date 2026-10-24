@@ -516,4 +516,4 @@ def import_transactions():
     return jsonify({"message": str(len(checked_transactions)) + " transactions imported."})   
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

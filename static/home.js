@@ -1,3 +1,11 @@
+// Shows the value and the EUR ticker when hover a chart
+Chart.defaults.plugins.tooltip.callbacks.label = function(context) {
+    if (context.dataset.label) {
+        return context.dataset.label + ": " + context.raw.toFixed(2) + " EUR";
+    }
+    return context.raw.toFixed(2) + " EUR";
+};
+
 // Runs when the page is loaded
 document.addEventListener("DOMContentLoaded", function () {
     loadRecentTransactions();
@@ -21,12 +29,13 @@ async function loadRecentTransactions() {
 
     // Builds one table row with the transaction data and adds it to the table
     const row = document.createElement("tr");
-    row.innerHTML =
-        "<td>" + transaction.date + "</td>" +
-        "<td>" + transaction.description + "</td>" + 
-        "<td>" + transaction.category + "</td>" +
-        "<td>" + transaction.account + "</td>" + 
-        "<td>" + amountEuros + " EUR</td>";
+    const values = [transaction.date, transaction.description, transaction.category, transaction.account, amountEuros + " EUR"];
+
+    for (let j = 0; j < values.length; j++) {
+        const cell = document.createElement("td");
+        cell.textContent = values[j];
+        row.appendChild(cell);
+    }
 
     tableBody.appendChild(row);
     }

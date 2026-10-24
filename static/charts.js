@@ -1,5 +1,12 @@
+// Month that is selected in the dropdown.
+let selectedMonth = "";
+
 // Runs when the page is loaded
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+
+    // Dropdown for the month has to be filled first, because many charts need this data
+    await loadMonthOptions();
+
     loadCategoryChart();
     loadIncomeChart();
     loadMonthlyChart();
@@ -10,9 +17,53 @@ document.addEventListener("DOMContentLoaded", function () {
     loadBudgetCategoryOptions();
 });
 
+// Fetches all months and fills the dropdown for the month selection
+async function loadMonthOptions() {
+    const response = await fetch("/api/summary/monthly");
+    const months = await response.json();
+
+    // Finds the select element where the options will be inserted
+    const monthSelect = document.querySelector("#month-select");
+
+    for (let i = 0; i < months.length; i++) {
+        const option = document.createElement("option");
+        option.value = months[i].month;
+        option.textContent = months[i].month;
+
+        monthSelect.appendChild(option);
+    }
+
+    // Newest month is selected first
+    if (months.length > 0) {
+        selectedMonth = months[months.length - 1].month;
+        monthSelect.value = selectedMonth;
+    }
+}
+
+// When the month selection is changed, the charts have to be reloaded
+document.querySelector("#month-select").addEventListener("change", function () {
+    selectedMonth = document.querySelector("#month-select").value;
+    loadCategoryChart();
+    loadIncomeChart();
+    loadOverallBudgetChart();
+    loadCategoryBudgetChart();
+});
+
+// Shows a success or error message above the charts
+function showMessage(text, isError) {
+    const messageBox = document.querySelector("#message");
+    messageBox.textContent = text;
+
+    if (isError) {
+        messageBox.className = "alert alert-danger";
+    } else {
+        messageBox.className = "alert alert-success";
+    }
+}
+
 // Fetches the category summary and draws a pie chart (Spending by category)
 async function loadCategoryChart() {
-    const response = await fetch("/api/summary/by-category?month=2026-08");
+    const response = await fetch("/api/summary/by-category?month=" + selectedMonth);
     const summary = await response.json();
 
     const labels = [];
@@ -33,6 +84,11 @@ async function loadCategoryChart() {
     // Finds the canvas elements and draws the pie chart
     const canvas = document.querySelector("#category-chart");
 
+    // Deletes the old chart if there is one, so that a new chart can be drawn
+    if (Chart.getChart(canvas)) {
+        Chart.getChart(canvas).destroy();
+    }
+
     new Chart(canvas, {
         type: "pie",
         data: {
@@ -46,7 +102,7 @@ async function loadCategoryChart() {
 
 // Fetches the category summary and draws a pie chart (Spending by income)
 async function loadIncomeChart() {
-    const response = await fetch("/api/summary/by-category?month=2026-08");
+    const response = await fetch("/api/summary/by-category?month=" + selectedMonth);
     const summary = await response.json();
 
     const labels = [];
@@ -64,6 +120,11 @@ async function loadIncomeChart() {
 
     // Finds the canvas elements and draws the pie chart
     const canvas = document.querySelector("#income-chart");
+
+        // Deletes the old chart if there is one, so that a new chart can be drawn
+    if (Chart.getChart(canvas)) {
+        Chart.getChart(canvas).destroy();
+    }
 
     new Chart(canvas, {
         type: "pie",
@@ -148,7 +209,7 @@ async function loadTrendsChart() {
 
 // Fetches the budgets and monthly spending and draws the overall budget chart
 async function loadOverallBudgetChart() {
-    const budgetsResponse = await fetch("/api/budgets?month=2026-08");
+    const budgetsResponse = await fetch("/api/budgets?month=" + selectedMonth);
     const budgets = await budgetsResponse.json();
 
     const monthlyResponse = await fetch("/api/summary/monthly");
@@ -169,7 +230,7 @@ async function loadOverallBudgetChart() {
     for (let i = 0; i < monthlySummary.length; i++) {
         const entry = monthlySummary[i];
 
-        if (entry.month === "2026-08") {
+        if (entry.month === selectedMonth) {
             spentCents = Math.abs(entry.expenses_cents);
         }
     }
@@ -179,6 +240,11 @@ async function loadOverallBudgetChart() {
 
     // Finds the canvas element and draws the pie chart
     const canvas = document.querySelector("#overall-budget-chart");
+
+        // Deletes the old chart if there is one, so that a new chart can be drawn
+    if (Chart.getChart(canvas)) {
+        Chart.getChart(canvas).destroy();
+    }
 
     new Chart(canvas, {
         type: "pie",
@@ -193,10 +259,10 @@ async function loadOverallBudgetChart() {
 
 // Fetches the budgets and category spending and draws a bar chart per category
 async function loadCategoryBudgetChart() {
-    const budgetsResponse = await fetch("/api/budgets?month=2026-08");
+    const budgetsResponse = await fetch("/api/budgets?month=" + selectedMonth);
     const budgets = await budgetsResponse.json();
 
-    const categoryResponse = await fetch("/api/summary/by-category?month=2026-08");
+    const categoryResponse = await fetch("/api/summary/by-category?month=" + selectedMonth);
     const categorySummary = await categoryResponse.json();
 
     const labels = [];
@@ -229,6 +295,11 @@ async function loadCategoryBudgetChart() {
 
     // Finds the canvas element and draws the bar chart
     const canvas = document.querySelector("#category-budget-chart");
+
+    // Deletes the old chart if there is one, so that a new chart can be drawn
+    if (Chart.getChart(canvas)) {
+        Chart.getChart(canvas).destroy();
+    }
 
     new Chart(canvas, {
         type: "bar",
@@ -314,17 +385,31 @@ document.querySelector("#set-budget-form").addEventListener("submit", async func
     }
 
     const newBudget = {
-        month: "2026-08",
+        month: selectedMonth,
         limit_cents: Math.round(document.querySelector("#budget-limit").value * 100),
         category_id: categoryIdToSend,
     };
 
-    await fetch ("/api/budgets", {
+    const response = await fetch("/api/budgets", {
         method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(newBudget),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newBudget)
     });
 
-    // Reload the page so that the new budget appears
-    location.reload();
-});
+    const result = await response.json();
+
+    // Shows the error message if something went wrong
+    if (result.error) {
+        showMessage(result.error, true);
+        return;
+    }
+
+    // Shows the success message if the budget was set successfully
+    showMessage(result.message, false);
+    document.querySelector("#set-budget-form").reset();
+    loadOverallBudgetChart();
+    loadCategoryBudgetChart();
+
+    });

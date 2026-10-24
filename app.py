@@ -18,6 +18,14 @@ def is_valid_date(date_text):
     except (ValueError, TypeError):
         return False
 
+# Checks if a text is a real month
+def is_valid_month(month_text):
+    try:
+        datetime.strptime(month_text, "%Y-%m")
+        return True
+    except (ValueError, TypeError):
+        return False
+
 #Checks all values of one transaction before it is saved
 def validate_transaction(cur, date, description, amount, account_id, category_id):
     if not is_valid_date(date):
@@ -353,6 +361,21 @@ def set_budget():
 
     # Read the JSON data
     data = request.get_json()
+
+    # Check values
+    if not is_valid_month(data["month"]):
+        conn.close()
+        return jsonify({"error": "Invalid month format. Please use YYYY-MM."})
+    if data["limit_cents"] < 0:
+        conn.close()
+        return jsonify({"error": "Budget limit cannot be negative."})
+
+    # Check if the category exists/ None means overall budget
+    if data.get("category_id") is not None:
+        cur.execute("SELECT id FROM categories WHERE id = :id", {"id": data["category_id"]})
+        if cur.fetchone() is None:
+            conn.close()
+            return jsonify({"error": "Category does not exist."})
 
     # Deletes the budget for this month and category (if one exists)
     cur.execute(

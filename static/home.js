@@ -64,11 +64,18 @@ async function loadNetWorthChart() {
 
 // Fetches the budgets and monthly spending and draws the overall budget chart
 async function loadBudgetChart() {
-    const budgetsResponse = await fetch("/api/budgets?month=2026-08");
-    const budgets = await budgetsResponse.json();
 
     const monthlyResponse = await fetch("/api/summary/monthly");
     const monthlySummary = await monthlyResponse.json();
+
+    // The newest month is shown
+    let month ="";
+    if (monthlySummary.length > 0) {
+        month = monthlySummary[monthlySummary.length - 1].month;
+    }
+
+    const budgetsResponse = await fetch("/api/budgets?month=" + month);
+    const budgets = await budgetsResponse.json();
 
     // Find the overall budget
     let overallLimitCents = 0;
@@ -85,7 +92,7 @@ async function loadBudgetChart() {
     for (let i = 0; i < monthlySummary.length; i++) {
         const entry = monthlySummary[i];
 
-        if (entry.month === "2026-08") {
+        if (entry.month === month) {
             spentCents = Math.abs(entry.expenses_cents);
         }
     }

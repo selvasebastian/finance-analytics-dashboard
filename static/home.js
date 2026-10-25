@@ -117,7 +117,8 @@ async function loadBudgetChart() {
         data: {
             labels: ["Spent", "Remaining"],
             datasets: [{
-                data: [spentEuros, remainingEuros]
+                data: [spentEuros, remainingEuros],
+                backgroundColor: ["red", "green"]
             }],
         },
     });

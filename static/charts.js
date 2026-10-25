@@ -173,10 +173,12 @@ async function loadMonthlyChart() {
                 {
                     label: "Income",
                     data: incomeValues,
+                    backgroundColor: "green",
                 },
                 {
                     label: "Expenses",
                     data: expenseValues,
+                    backgroundColor: "red",
                 }
             ]
         },
@@ -219,6 +221,8 @@ async function loadTrendsChart() {
                 {
                     label: "Spending per Month",
                     data: expenseValues,
+                    borderColor: "red",
+                    backgroundColor: "red",
                 }
             ]
         },
@@ -279,7 +283,8 @@ async function loadOverallBudgetChart() {
         data: {
             labels: ["Spent", "Remaining"],
             datasets: [{
-                data: [spentEuros, remainingEuros]
+                data: [spentEuros, remainingEuros],
+                backgroundColor: ["red", "green"],
             }],
         },
     });
@@ -337,10 +342,12 @@ async function loadCategoryBudgetChart() {
                 {
                     label: "Budget",
                     data: limitValues,
+                    backgroundColor: "lightblue",
                 },
                 {
                     label: "Spent",
                     data: spentValues,
+                    backgroundColor: "red",
                 },
             ],
         },

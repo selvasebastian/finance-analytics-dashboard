@@ -211,4 +211,7 @@ Other Changes
 - ...
 
 ## Note on the submission
-The Phase 1 documents were submitted once as original and once as updated Version according to the feedback.
+The Phase 1, 2 documents were submitted once as original and once as updated Version according to the feedback. For Phase 3 I assumed that the 2 page limit only includes text and not pictures. The diagram of Phase 3 is also available on GitHub:
+
+![Feature overview](docs/feature_overview.png)
+

@@ -163,6 +163,10 @@ document.querySelector("#add-account-form").addEventListener("submit", async fun
 
 // Handles clicking the reset button
 document.querySelector("#reset-button").addEventListener("click", async function (){
+    // Ask first, because all transactions will be deleted
+    if (!confirm("Are you sure you want to delete all transactions? This cannot be undone.")) {
+        return;
+    }
     const response = await fetch("/api/reset", {
         method: "POST",
     });
